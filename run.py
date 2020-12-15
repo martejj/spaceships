@@ -60,10 +60,11 @@ def get_spaceships():
     return jsonify(s_ids=models.get_s_ids())
 
 @app.route('/api/spaceship/travel/', methods=["PUT"])
-@validate_args(LIDSchema, 'l_id_data')
-@validate_args(SIDSchema, 's_id_data')
-def travel_ship(l_id_data, s_id_data):
-    pass
+@validate_args(LIDSchema, 'location')
+@validate_args(SIDSchema, 'spaceship')
+def travel_ship(location, spaceship):
+    spaceship.travel(location)
+    return "Success"
 
 @app.route('/api/spaceship/', methods=["DELETE"])
 @validate_args(SIDSchema, 'spaceship')

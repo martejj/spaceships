@@ -82,5 +82,7 @@ class SpaceshipPostSchema(Schema):
 class SpaceshipUpdateSchema(Schema):
     name = string
     model = string
-    location = l_id
     status = status
+
+    class Meta():
+        unknown = EXCLUDE

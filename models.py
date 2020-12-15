@@ -35,6 +35,18 @@ class Spaceship():
         del spaceships[self.id]
         self.location.remove_spaceship(self)
 
+    def travel(self, location):
+        if location.is_full():
+            abort(400, "Location is at capacity")
+        
+        if not self.status == "Operational":
+            abort(400, "Spaceship is inoperable")
+
+        # Remove self from previous location, update self and new location 
+        self.location.remove_spaceship(self)
+        self.location = location
+        self.location.add_spaceship(self)
+
     def get_json(self):
         return {"name": self.name, "id": self.id, "model": self.model, "status": self.status, "l_id": self.l_id}
 
