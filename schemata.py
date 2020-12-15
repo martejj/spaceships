@@ -1,10 +1,12 @@
 from marshmallow import Schema, fields, ValidationError, validates, validate, EXCLUDE
 
-s_id_required = fields.UUID(required=True)
-s_id = fields.UUID()
+# Regex from https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid
+# Dont use inbuilt UUID otherwise it parses the string weirdly. (e.g. inserts -'s)
+s_id_required = fields.Str(required=True, validate=validate.Regexp('^[0-9a-f]{8}[0-9a-f]{4}[0-5][0-9a-f]{3}[089ab][0-9a-f]{3}[0-9a-f]{12}$', error="Malformed UUID"))
+s_id = fields.Str(validate=validate.Regexp('^[0-9a-f]{8}[0-9a-f]{4}[0-5][0-9a-f]{3}[089ab][0-9a-f]{3}[0-9a-f]{12}$', error="Malformed UUID"))
 
-l_id_required = fields.UUID(required=True)
-l_id = fields.UUID()
+l_id_required = fields.Str(required=True, validate=validate.Regexp('^[0-9a-f]{8}[0-9a-f]{4}[0-5][0-9a-f]{3}[089ab][0-9a-f]{3}[0-9a-f]{12}$', error="Malformed UUID"))
+l_id = fields.Str(validate=validate.Regexp('^[0-9a-f]{8}[0-9a-f]{4}[0-5][0-9a-f]{3}[089ab][0-9a-f]{3}[0-9a-f]{12}$', error="Malformed UUID"))
 
 string_required = fields.Str(validate=validate.Length(min=1, max=256), required=True)
 string = fields.Str(validate=validate.Length(min=1, max=256))
