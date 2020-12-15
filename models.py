@@ -9,6 +9,18 @@ def add_location(location):
 def add_spaceship(spaceship):
     spaceships[spaceship.id] = spaceship
 
+def get_s_ids():
+    s_ids = []
+    for s_id in spaceships:
+        s_ids.append(s_id)
+    return s_ids
+
+def get_l_ids():
+    l_ids = []
+    for l_id in locations:
+        l_ids.append(l_id)
+    return l_ids
+
 class Spaceship():
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)

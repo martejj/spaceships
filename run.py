@@ -32,10 +32,7 @@ def get_location(location):
 
 @app.route('/api/locations/', methods=["GET"])
 def get_locations():
-    l_ids = []
-    for l_id in locations:
-        l_ids.append(l_id)
-    return jsonify(l_ids=l_ids)
+    return jsonify(l_ids=models.get_l_ids())
 
 @app.route('/api/location/', methods=["DELETE"])
 @validate_args(LIDSchema, 'l_id_data')
@@ -59,10 +56,7 @@ def get_spaceship(spaceship):
 
 @app.route('/api/spaceships/', methods=["GET"])
 def get_spaceships():
-    s_ids = []
-    for s_id in spaceships:
-        s_ids.append(s_id)
-    return jsonify(s_ids=s_ids)
+    return jsonify(s_ids=models.get_s_ids())
 
 @app.route('/api/spaceship/travel/', methods=["PUT"])
 @validate_args(LIDSchema, 'l_id_data')
