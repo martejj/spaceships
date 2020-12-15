@@ -3,6 +3,7 @@ from util import validate_args, validate_body
 from schemata import SIDSchema, LIDSchema, SpaceshipPostSchema, SpaceshipUpdateSchema, LocationPostSchema, LocationUpdateSchema
 import uuid
 from pprint import pprint
+import models
 
 app = Flask(__name__)
 
@@ -18,21 +19,15 @@ def hello():
 '''
 
 @app.route('/api/location/', methods=["POST"])
-@validate_body(LocationPostSchema)
-def post_location(data):
-    data['id'] = uuid.uuid4().hex
-    data['num_spaceships'] = 0
-    data['spaceships'] = []
-    locations[data['id']] = data
-    return jsonify(id=data['id'])
+@validate_body(LocationPostSchema, 'location')
+def post_location(location):
+    models.add_location(location)
+    return jsonify(id=location.id)
 
 @app.route('/api/location/', methods=["GET"])
-@validate_args(LIDSchema)
-def get_location(args_data):
-    uuid = args_data['l_id']
-    if uuid in locations:
-        return jsonify(locations[uuid])
-    abort(400, "Invalid l_id: Location does not exist")
+@validate_args(LIDSchema, 'location')
+def get_location(location):
+    return location.get_json()
         
 
 @app.route('/api/locations/', methods=["GET"])
@@ -52,32 +47,15 @@ def remove_location(l_id_data):
 '''
 
 @app.route('/api/spaceship/', methods=["POST"])
-@validate_body(SpaceshipPostSchema)
-def post_spaceship(data):
-    
-    if not data['l_id'] in locations:
-        abort(400, "Invalid l_id: Location does not exist")
-
-    location = locations[data['l_id']]
-    # If capacity add it.
-    print(location['num_spaceships'])
-    print(location['capacity'])
-    if location['num_spaceships'] < location['capacity']:
-        data['id'] = uuid.uuid4().hex
-        spaceships[data['id']] = data
-        location['num_spaceships'] += 1
-        location['spaceships'].append(data['id'])
-        return jsonify(id=data['id'])
-    else:
-        abort(400, "Location is at capacity")
+@validate_body(SpaceshipPostSchema, 'spaceship')
+def post_spaceship(spaceship):
+    models.add_spaceship(spaceship)
+    return jsonify(id=spaceship.id)
 
 @app.route('/api/spaceship/', methods=["GET"])
-@validate_args(SIDSchema)
-def get_spaceship(args_data):
-    uuid = args_data['s_id']
-    if uuid in spaceships:
-        return jsonify(spaceships[uuid])
-    abort(400, "Invalid s_id: Spaceship does not exist")
+@validate_args(SIDSchema, 'spaceship')
+def get_spaceship(spaceship):
+    return spaceship.get_json()
 
 @app.route('/api/spaceships/', methods=["GET"])
 def get_spaceships():

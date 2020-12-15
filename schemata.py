@@ -25,20 +25,6 @@ planet = fields.Str(validate=validate.OneOf(planets))
 capacity_required = fields.Integer(required=True, validate=validate.Range(min=1, error="Value must be greater than 0"))
 capacity = fields.Integer(validate=validate.Range(min=1, error="Value must be greater than 0"))
 
-class SIDSchemaNew(Schema):
-    s_id = s_id_required
-
-    class Meta:
-        # If there are extra fields then ignore them. Allows for the extraction of 
-        # specific starship data
-        unknown = EXCLUDE
-    
-    @post_load
-    def get_spaceship(self, data):
-        if not data['id'] in spaceships:
-            abort(400, "Invalid s_id: Spaceship does not exist")
-        return spaceships[data['id']]
-
 class SIDSchema(Schema):
     s_id = s_id_required
 
@@ -47,19 +33,11 @@ class SIDSchema(Schema):
         # specific starship data
         unknown = EXCLUDE
     
-
-
-class LIDSchemaNew(Schema):
-    l_id = l_id_required
-
-    class Meta:
-        unknown = EXCLUDE
-
     @post_load
-    def get_location(self, data):
-        if not data['id'] in locations:
-            abort(400, "Invalid l_id: Location does not exist")
-        return locations[data['id']]
+    def get_spaceship(self, data, **kwargs):
+        if not data['s_id'] in spaceships:
+            abort(400, "Invalid s_id: Spaceship does not exist")
+        return spaceships[data['s_id']]
 
 class LIDSchema(Schema):
     l_id = l_id_required
@@ -67,34 +45,39 @@ class LIDSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
+    @post_load
+    def get_location(self, data, **kwargs):
+        if not data['l_id'] in locations:
+            abort(400, "Invalid l_id: Location does not exist")
+        return locations[data['l_id']]
+
 class LocationPostSchema(Schema):
     name = string_required
     planet = planet_required
     capacity = capacity_required
+
+    @post_load
+    def make_location(self, data, **kwargs):
+        data['id'] = uuid.uuid4().hex
+        return Location(**data)
 
 class LocationUpdateSchema(Schema):
     name = string
     planet = planet
     capacity = capacity
 
-class SpaceshipPostSchemaNew(Schema):
+class SpaceshipPostSchema(Schema):
     name = string_required
     model = string_required
     l_id = l_id_required
     status = status_required
 
     @post_load
-    def make_spaceship(self, data):
+    def make_spaceship(self, data, **kwargs):
         if not data['l_id'] in locations:
             abort(400, "Invalid l_id: Location does not exist")
         data['id'] = uuid.uuid4().hex
         return Spaceship(**data)
-
-class SpaceshipPostSchema(Schema):
-    name = string_required
-    model = string_required
-    l_id = l_id_required
-    status = status_required
 
 class SpaceshipUpdateSchema(Schema):
     name = string
