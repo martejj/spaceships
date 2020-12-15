@@ -1,5 +1,5 @@
 from flask import abort
-
+from pprint import pprint
 spaceships = {}
 locations = {}
 
@@ -46,6 +46,10 @@ class Spaceship():
         self.location.remove_spaceship(self)
         self.location = location
         self.location.add_spaceship(self)
+        self.l_id = self.location.id
+
+    def update(self, update_dict):
+        self.__dict__.update(update_dict)
 
     def get_json(self):
         return {"name": self.name, "id": self.id, "model": self.model, "status": self.status, "l_id": self.l_id}

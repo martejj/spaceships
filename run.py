@@ -71,3 +71,10 @@ def travel_ship(location, spaceship):
 def remove_spaceship(spaceship):
     spaceship.delete()
     return "Success"
+
+@app.route('/api/spaceship/', methods=["PATCH"])
+@validate_args(SIDSchema, 'spaceship')
+@validate_body(SpaceshipUpdateSchema)
+def update_spaceship(spaceship, data):
+    spaceship.update(data)
+    return "Success"
