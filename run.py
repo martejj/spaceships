@@ -35,9 +35,10 @@ def get_locations():
     return jsonify(l_ids=models.get_l_ids())
 
 @app.route('/api/location/', methods=["DELETE"])
-@validate_args(LIDSchema, 'l_id_data')
-def remove_location(l_id_data):
-    pass
+@validate_args(LIDSchema, 'location')
+def remove_location(location):
+    location.delete()
+    return "Success"
 
 '''
     /api/spaceship endpoints
@@ -65,9 +66,7 @@ def travel_ship(l_id_data, s_id_data):
     pass
 
 @app.route('/api/spaceship/', methods=["DELETE"])
-@validate_args(SIDSchema, 's_id_data')
-def remove_spaceship(s_id_data):
-    if not s_id_data in spaceships:
-        abort(400, "Invalid s_id: Spaceship does not exist")
-    spaceship = spaceships[s_id_data]
-
+@validate_args(SIDSchema, 'spaceship')
+def remove_spaceship(spaceship):
+    spaceship.delete()
+    return "Success"

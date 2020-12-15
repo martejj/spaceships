@@ -21,6 +21,7 @@ def get_l_ids():
         l_ids.append(l_id)
     return l_ids
 
+
 class Spaceship():
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -29,6 +30,10 @@ class Spaceship():
         if self.location.is_full():
             abort(400, "Location is at capacity")
         self.location.add_spaceship(self)
+
+    def delete(self):
+        del spaceships[self.id]
+        self.location.remove_spaceship(self)
 
     def get_json(self):
         return {"name": self.name, "id": self.id, "model": self.model, "status": self.status, "l_id": self.l_id}
@@ -40,6 +45,16 @@ class Location():
         self.s_ids = []
         self.spaceships = []
         self.num_spaceships = 0
+
+    def delete(self):
+        for spaceship in self.spaceships:
+            spaceship.delete()
+        del locations[self.id]
+
+    def remove_spaceship(self, spaceship):
+        self.spaceships.remove(spaceship)
+        self.s_ids.remove(spaceship.id)
+        self.num_spaceships -= 1
 
     def is_full(self):
         return self.num_spaceships >= self.capacity
