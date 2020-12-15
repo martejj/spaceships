@@ -1,4 +1,7 @@
-from marshmallow import Schema, fields, ValidationError, validates, validate, EXCLUDE
+from marshmallow import Schema, fields, ValidationError, validates, validate, EXCLUDE, post_load
+from models import locations, spaceships, Spaceship, Location
+from flask import abort
+import uuid
 
 # Regex from https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid
 # Dont use inbuilt UUID otherwise it parses the string weirdly. (e.g. inserts -'s)
@@ -22,6 +25,20 @@ planet = fields.Str(validate=validate.OneOf(planets))
 capacity_required = fields.Integer(required=True, validate=validate.Range(min=1, error="Value must be greater than 0"))
 capacity = fields.Integer(validate=validate.Range(min=1, error="Value must be greater than 0"))
 
+class SIDSchemaNew(Schema):
+    s_id = s_id_required
+
+    class Meta:
+        # If there are extra fields then ignore them. Allows for the extraction of 
+        # specific starship data
+        unknown = EXCLUDE
+    
+    @post_load
+    def get_spaceship(self, data):
+        if not data['id'] in spaceships:
+            abort(400, "Invalid s_id: Spaceship does not exist")
+        return spaceships[data['id']]
+
 class SIDSchema(Schema):
     s_id = s_id_required
 
@@ -29,6 +46,20 @@ class SIDSchema(Schema):
         # If there are extra fields then ignore them. Allows for the extraction of 
         # specific starship data
         unknown = EXCLUDE
+    
+
+
+class LIDSchemaNew(Schema):
+    l_id = l_id_required
+
+    class Meta:
+        unknown = EXCLUDE
+
+    @post_load
+    def get_location(self, data):
+        if not data['id'] in locations:
+            abort(400, "Invalid l_id: Location does not exist")
+        return locations[data['id']]
 
 class LIDSchema(Schema):
     l_id = l_id_required
@@ -46,10 +77,23 @@ class LocationUpdateSchema(Schema):
     planet = planet
     capacity = capacity
 
+class SpaceshipPostSchemaNew(Schema):
+    name = string_required
+    model = string_required
+    l_id = l_id_required
+    status = status_required
+
+    @post_load
+    def make_spaceship(self, data):
+        if not data['l_id'] in locations:
+            abort(400, "Invalid l_id: Location does not exist")
+        data['id'] = uuid.uuid4().hex
+        return Spaceship(**data)
+
 class SpaceshipPostSchema(Schema):
     name = string_required
     model = string_required
-    location = l_id_required
+    l_id = l_id_required
     status = status_required
 
 class SpaceshipUpdateSchema(Schema):
