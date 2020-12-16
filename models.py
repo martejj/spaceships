@@ -1,7 +1,11 @@
 from flask import abort
 from pprint import pprint
+
+# data stores
 spaceships = {}
 locations = {}
+
+# Static helper functions
 
 def add_location(location):
     locations[location.id] = location
@@ -21,6 +25,7 @@ def get_l_ids():
         l_ids.append(l_id)
     return l_ids
 
+# Models
 
 class Spaceship():
     def __init__(self, **kwargs):
